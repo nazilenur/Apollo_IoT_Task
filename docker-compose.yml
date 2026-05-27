@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # 1. DATABASE (Çelik Kasa)
+  postgres_db:
+    image: postgres:15
+    container_name: apollo_postgres
+    environment:
+      POSTGRES_USER: apollo_admin
+      POSTGRES_PASSWORD: apollo_iot_pass
+      POSTGRES_DB: apollo_task
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d/
+
+  # 2. MODBUS SERVER
+  modbus_server:
+    build: .
+    container_name: modbus_server
+    command: python modbus_server.py
+    ports:
+      - "5020:5020"
+
+  # 3. SUBSCRIBER (Dinleyici)
+  iot_subscriber:
+    build: .
+    container_name: iot_subscriber
+    command: python mqtt_subscriber.py
+    depends_on:
+      - postgres_db
+
+  # 4. PUBLISHER (Kurye)
+  iot_publisher:
+    build: .
+    container_name: iot_publisher
+    command: python mqtt_publisher.py
+    depends_on:
+      - modbus_server

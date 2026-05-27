@@ -1,0 +1,6 @@
+paho-mqtt
+pymodbus==3.0.0
+pyserial
+pyserial-asyncio
+psycopg2-binary
+python-dotenv
