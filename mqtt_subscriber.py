@@ -19,7 +19,6 @@ def get_db_connection():
         password=DB_PASS
     )
 
-# Settings (Must match the Publisher settings)
 MQTT_BROKER = "broker.hivemq.com"
 MQTT_PORT = 1883
 MQTT_TOPIC = "nazile/iot_task/data"
@@ -30,21 +29,20 @@ def on_connect(client, userdata, flags, rc, properties=None):
 
 def on_message(client, userdata, msg):
     print(f"Message received on topic {msg.topic}")
-    # Decode the JSON payload and print it
+   
     payload = json.loads(msg.payload.decode())
     print(f"Data received, Voltage:{payload['voltage']}V, Current:{payload['current']}A, Power:{payload['power']}W, Temperature:{payload['temperature']}C, Status:{payload['device_status_modbus']}")
 
-    # --- VERİYİ KASAYA KAYDETME ---
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Kasaya veriyi ekleme (INSERT) talimatı
+        
         insert_query = """
             INSERT INTO sensor_data (timestamp, voltage, current, power, temperature, device_status_modbus)
             VALUES (%s, %s, %s, %s, %s, %s)
         """
-        # Kargodan çıkanları sırayla yerine koyuyoruz
+        
         datas = (
             payload['timestamp'], 
             payload['voltage'], 
@@ -55,7 +53,7 @@ def on_message(client, userdata, msg):
         )
         
         cursor.execute(insert_query, datas)
-        conn.commit() # "Kasayı kilitle ve kaydet" demek
+        conn.commit() 
         
         cursor.close()
         conn.close()
@@ -64,7 +62,7 @@ def on_message(client, userdata, msg):
     except Exception as e:
         print(f"Error saving to database: {e}")
 
-# MQTT Setup
+
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 client.on_connect = on_connect
 client.on_message = on_message

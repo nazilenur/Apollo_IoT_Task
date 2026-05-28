@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # 1. DATABASE (Çelik Kasa)
+  
   postgres_db:
     image: postgres:15
     container_name: apollo_postgres
@@ -14,7 +14,7 @@ services:
     volumes:
       - ./db:/docker-entrypoint-initdb.d/
 
-  # 2. MODBUS SERVER
+  
   modbus_server:
     build: .
     container_name: modbus_server
@@ -22,7 +22,6 @@ services:
     ports:
       - "5020:5020"
 
-  # 3. SUBSCRIBER (Dinleyici)
   iot_subscriber:
     build: .
     container_name: iot_subscriber
@@ -30,7 +29,7 @@ services:
     depends_on:
       - postgres_db
 
-  # 4. PUBLISHER (Kurye)
+  
   iot_publisher:
     build: .
     container_name: iot_publisher
